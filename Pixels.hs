@@ -5,7 +5,14 @@ module Pixels
       pixelListToPixels,
       pixelListToString,
       concatPixels,
-      messageToPixels
+      messageToPixels,
+      up,
+      down,
+      left,
+      right,
+      upsideDown,
+      backwards,
+      negative
     ) where
 
 
@@ -107,15 +114,19 @@ fontBitmap =
     [ 0x00, 0x41, 0x36, 0x08, 0x00 ]  --  }
   ]
 
+-- Definition of the data tipe 'Pixel' which is basically a string
 data Pixel = Pixel { mensaje :: [String] }
 
-
+-- Instance of show function for print 'Pixel' data on the STDO
 instance Show Pixel where
     show (Pixel {mensaje = m}) = showPixels m
         where 
             showPixels [] = ""
             showPixels (m:ms) = show m ++ "\n" ++ showPixels ms 
 
+-- Convert a 'Char' into a 'Pixel' using the values stored on fontBitmap array
+-- first convert the int value on the array into a boolean and then use the
+-- binary numbers to set the pixels on the string.
 font :: Char -> Pixel  
 font c = convertToPixel $ (recombine (mapToBinary $ ascii c))
     where   
@@ -142,25 +153,30 @@ font c = convertToPixel $ (recombine (mapToBinary $ ascii c))
             | (fromEnum c) >= 32 && (fromEnum c) <= 125 = fontBitmap !! ((fromEnum c) - 32)
             | otherwise = [ 0x7F, 0x7F, 0x7F, 0x7F, 0x7F ]
         
-            
+-- Convert a 'Pixel' input into String
 pixelsToString :: Pixel -> String
 pixelsToString (Pixel {mensaje = m}) = foldr1 (++) m 
 
+-- Concatenate a Pixels array into a single Pixel value
 pixelListToPixels :: [Pixel] -> Pixel
 pixelListToPixels p = Pixel { mensaje = foldr1 (++) (map ((++[""]).(mensaje)) p) }
 
+-- Converte a Pixels array into a string value
 pixelListToString :: [Pixel] -> String
 pixelListToString p = pixelsToString $ pixelListToPixels p
 
+-- Concatenate a Pixels array into a single Pixel value
 concatPixels :: [Pixel] -> Pixel
 concatPixels p = Pixel { mensaje = foldr1 (concatLines) (map mensaje p) }
     where 
         concatLines [] [] = []
         concatLines (x:xs) (y:ys) = (x ++" "++ y):(concatLines xs ys)
 
+-- Transform a String into a Pixel value
 messageToPixels :: String -> Pixel
 messageToPixels s = concatPixels $ map font s
 
+-- 
 up :: Pixel -> Pixel
 up p =  Pixel { mensaje = (tail $ mensaje p) ++ [head $ mensaje p] }
 
