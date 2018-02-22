@@ -1,3 +1,15 @@
+-- This is the first large project of the Simon Bolivar University course 'Programation
+-- languages' (CI-3661). The project is an implementation on Haskell of a pixel inter-
+-- pretator from a String input. 
+
+--  Authors:
+--          Francisco Marcos    11-10569
+--          Johnnatan Reyes     12-11314
+
+-----------------------------------------------------------------------------------------
+--                                      Pixels                                         --
+-----------------------------------------------------------------------------------------
+
 module Pixels 
     ( Pixel(..), 
       font,
@@ -16,6 +28,7 @@ module Pixels
     ) where
 
 
+-- Gives the information for build the binary numbers to create Pixels
 fontBitmap =
   [
     [ 0x00, 0x00, 0x00, 0x00, 0x00 ], --  (space)
@@ -176,29 +189,35 @@ concatPixels p = Pixel { mensaje = foldr1 (concatLines) (map mensaje p) }
 messageToPixels :: String -> Pixel
 messageToPixels s = concatPixels $ map font s
 
--- 
+-- Move the row to the last 
 up :: Pixel -> Pixel
 up p =  Pixel { mensaje = (tail $ mensaje p) ++ [head $ mensaje p] }
 
+-- Move the last row to the first
 down :: Pixel -> Pixel
 down p =  Pixel { mensaje = (last $ mensaje p) : (init $ mensaje p) }
 
+-- Move the last column to the first
 left :: Pixel -> Pixel
 left p  = Pixel { mensaje = map columnl (mensaje p) }
     where
         columnl xs = (last xs) : (init xs)
 
+-- Move the first column to the last
 right :: Pixel -> Pixel
 right p = Pixel { mensaje = map columnr (mensaje p) }
     where
         columnr xs = (tail xs) ++ [head xs]
 
+-- Flip a pixel on a horizontal way
 upsideDown :: Pixel -> Pixel
 upsideDown p = Pixel { mensaje = reverse (mensaje p) } 
 
+-- Flip a pixel on a vertical way
 backwards :: Pixel -> Pixel
 backwards p = Pixel { mensaje = map reverse (mensaje p) }
 
+-- Invert the on/off pixels values
 negative :: Pixel -> Pixel
 negative p = Pixel { mensaje = map (map invert) (mensaje p) }
     where invert c 
